@@ -1,0 +1,80 @@
+
+<!DOCTYPE html>
+<html>
+<body>
+    <p>When you submit the form, a function is triggered which attempts to connect to mySql.</p>
+
+    <form action="" onsubmit="connect(event)">
+      Enter ip (example "172.17.0.3"): <input type="text" name="fname">
+      <input type="submit" value="Submit">
+    </form>
+    <br>
+    <br>
+    <button onclick="getItems()">Get Items</button>
+    <button onclick="addItem()">Add Item</button>
+    <button onclick="getState()">Get State</button>
+    
+    <script>
+    function getState() {
+        console.log("getting state");
+        fetch("/state")
+            .then( (response) => { 
+                console.log("response ", response)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    }
+
+    function getItems() {
+        console.log("getting items");
+        fetch("/items")
+            .then( (response) => { 
+                console.log("response ", response)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+    }
+
+    function connect(event) {
+        const name = event.target.elements[0].value;
+        console.log("event ", name);
+        fetch("/connect", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name })
+            })
+            .then( (response) => { 
+                console.log("response ", response)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+        event.preventDefault();
+    }
+
+    function addItem(event) {
+        fetch("/item", {
+                method: "post",
+                headers: {
+                    'Accept': 'application/json',
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ name: "Mark" })
+            })
+            .then( (response) => { 
+                console.log("response ", response)
+            })
+            .catch((error) => {
+                console.log(error)
+            });
+        event.preventDefault();
+    }
+    </script>
+
+</body>
+</html>
