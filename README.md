@@ -2,10 +2,8 @@
 
 This code is a modification of the get-started application from Docker guide.
 
-React has been removed
+React has been removed and replaced with javascript only
 
 The database has been made a singleton by using serviceInject function;
-
-This repository is a sample application for users following the getting started guide at https://docs.docker.com/get-started/.
 
 The application is based on the application from the getting started tutorial at https://github.com/docker/getting-started
