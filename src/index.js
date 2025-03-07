@@ -14,8 +14,8 @@ const injectServices = (fn) => {
 
 // Inject services into routes
 Object.keys(routes).forEach(key => {
-    routes[key] = injectServices(routes[key]); 
-});
+    routes[key] = injectServices(routes[key]);
+})
 
 const { connect, addItem, getItems, getState } = routes;
 
