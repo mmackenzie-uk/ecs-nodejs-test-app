@@ -1,15 +1,16 @@
 const {v4 : uuid} = require('uuid');
 
 module.exports = async (req, res, db) => {
+    const name = req.body.name;
     const item = {
         id: uuid(),
-        name: "Mark",
+        name,
         completed: false,
     };
 
     try {
         await db.storeItem(item);
-        res.sendStatus(200);
+        res.send(item);
     }
     catch (err) {
         console.log(err);

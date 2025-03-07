@@ -1,45 +1,133 @@
 
 <!DOCTYPE html>
 <html>
-<body>
-    <p>When you submit the form, a function is triggered which attempts to connect to mySql.</p>
-
-    <form action="" onsubmit="connect(event)">
-      Enter ip (example "172.17.0.3"): <input type="text" name="fname">
-      <input type="submit" value="Submit">
-    </form>
-    <br>
-    <br>
-    <button onclick="getItems()">Get Items</button>
-    <button onclick="addItem()">Add Item</button>
-    <button onclick="getState()">Get State</button>
+<style>
+    * {
+        font-family: Arial, Helvetica, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f7f7f7;
+    }
+    h3 {
+        margin-top: 10px;
+        margin-bottom: 10px;
+        color: #333;
+    }
+    form {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 10px;
+    }
+    input {
+        width: 100%;
+        border: 2px solid #777;
+        padding-left: 8px;
+        font-size: 14px;
+    }
+    p {
+        margin-bottom: 10px;
+    }
+    /* classes */
+    .start {
+        max-width: 600px;
+        width: 100%;
+        margin: 10px auto;
+    }
+    .wrap {
+        margin: 0 auto;
+        width: 90%;
+    }
+    .container {
+        max-width: 600px;
+        width: 100%;
+        margin: 0px auto;
+        margin-bottom: 20px;
+    }
+    .btn {
+        width: 100px;
+        height: 30px;
+        font-style: bold;
+        font-size: 14px;
+        margin-left: 5px;
+        border: 2px solid #777;
+    }
+    .response {
+        padding: 8px;
+        border: 2px solid #777;
+        background-color: #fff;
+        height: 90px;
+        margin-bottom: 20px;
+        overflow-y: scroll;
+        white-space: pre;
+    }
+    .heading {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+</style>
+<body onload="myFunction()">
+    <div id="start" class="start"></div>
+    <div class="wrap" id="wrap">
+        <div class="container">
+            <div class="heading"><h3>CONNECT</h3></div>
+            <form action="" onsubmit="connect(event)">
+                <input type="text" value="localhost">
+                <input class="btn" type="submit" value="Submit">
+            </form>
+            <div id="connect" class="response"></div>
+        </div>
+        <div class="container">
+            <div class="heading">
+                <h3>GET CONNECTION STATE</h3>
+                <button class="btn" onclick="getState()">Get State</button>
+            </div>
+            <div id="state" class="response"></div>
+        </div>
+        <div class="container">
+            
+            <div class="heading"><h3>ADD ITEM</h3></div>
+            <form action="" onsubmit="addItem(event)">
+                <input type="text">
+                <input class="btn" type="submit" value="Submit">
+            </form>
+            <div id="item" class="response"></div>
+        </div>
+        <div class="container">
+            <div class="heading">
+                <h3>GET ITEMS</h3>
+                <button class="btn" onclick="getItems()">Get Items</button>
+            </div>
+            <div id="items" class="response"></div>
+        </div>
+    </div>
     
     <script>
-    function getState() {
-        console.log("getting state");
-        fetch("/state")
-            .then( (response) => { 
-                console.log("response ", response)
-            })
-            .catch((error) => {
-                console.log(error)
-            });
+    function myFunction() {
+        document.getElementById("start").innerHTML = "... Page Loading";
+        document.getElementById("wrap").style.display = "none";
+        setTimeout(() => {
+            document.getElementById("start").innerHTML = "";
+            document.getElementById("wrap").style.display = "block";
+        }, 100)
     }
 
-    function getItems() {
-        console.log("getting items");
-        fetch("/items")
-            .then( (response) => { 
-                console.log("response ", response)
-            })
-            .catch((error) => {
-                console.log(error)
-            });
+    function formatData(data) {
+        let text = "";
+        Object.keys(data).forEach((key, idx, array) => {
+            text = text + " " + key + ": " + data[key] + "<br/>";
+            // if (idx !== array.length - 1){ 
+            //     text = text + ", ";
+            // }
+        });
+        return text;
     }
 
     function connect(event) {
         const name = event.target.elements[0].value;
         console.log("event ", name);
+        document.getElementById("connect").innerHTML = "... Loading"
         fetch("/connect", {
                 method: "post",
                 headers: {
@@ -49,30 +137,83 @@
                 body: JSON.stringify({ name })
             })
             .then( (response) => { 
-                console.log("response ", response)
+                console.log("response ", response);
+                return response.json();
+            })
+            .then( (data) => {
+                console.log(data)
+                document.getElementById("connect").innerHTML = formatData(data);
             })
             .catch((error) => {
                 console.log(error)
+                document.getElementById("connect").innerHTML = "Error loading"
             });
         event.preventDefault();
     }
 
+    function getState() {
+        console.log("getting state");
+        document.getElementById("state").innerHTML = "... Loading"
+        fetch("/state")
+            .then( (response) => { 
+                console.log("response ", response);
+                return response.json();
+            })
+            .then( (data) => {
+                console.log(data)
+                document.getElementById("state").innerHTML = formatData(data);
+            })
+            .catch((error) => {
+                console.log(error);
+                document.getElementById("state").innerHTML = "Error loading"
+            });
+    }
     function addItem(event) {
+        const name = event.target.elements[0].value;
+        document.getElementById("item").innerHTML = "... Loading"
         fetch("/item", {
                 method: "post",
                 headers: {
                     'Accept': 'application/json',
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ name: "Mark" })
+                body: JSON.stringify({ name })
             })
             .then( (response) => { 
-                console.log("response ", response)
+                console.log("response ", response);
+                return response.json();
+            })
+            .then( (data) => {
+                console.log(data)
+                document.getElementById("item").innerHTML = formatData(data);
             })
             .catch((error) => {
                 console.log(error)
+                document.getElementById("item").innerHTML = "Error loading"
+
             });
         event.preventDefault();
+    }
+    function getItems() {
+        console.log("getting items");
+        document.getElementById("items").innerHTML = "... Loading"
+        fetch("/items")
+            .then( (response) => { 
+                console.log("response ", response);
+                return response.json();
+            })
+            .then( (data) => {
+                console.log(data)
+                let text = "";
+                data.forEach((value) => {
+                    text = text + JSON.stringify(value) + "<br/>";
+                });
+                document.getElementById("items").innerHTML = text; //JSON.stringify(data);
+            })
+            .catch((error) => {
+                console.log(error)
+                document.getElementById("items").innerHTML = "Error loading"
+            });
     }
     </script>
 
