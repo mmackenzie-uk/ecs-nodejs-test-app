@@ -8,6 +8,8 @@ The database has been made a singleton by using serviceInject function.
 
 The application is based on the application from the getting started tutorial at:
 <br>
+<br>
 https://github.com/docker/getting-started
+<br>
 <br>
 ![Alt text](https://github.com/mmackenzie-uk/ecs-nodejs-test-app/blob/main/display.png)
