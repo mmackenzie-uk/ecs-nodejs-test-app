@@ -1,7 +1,7 @@
 // required to behave like a singleton. Import only once in app
 
 const mysql = require('mysql2');
-const { HOST, USER, PASSWORD, DATABASE } = require('../config');
+const { HOST, USER, PASSWORD, DATABASE, CHAR_SET, CONNECTION_LIMIT } = require('../config');
 
 let pool;
 let count = 0;
@@ -14,16 +14,15 @@ function connect(host = HOST) {
         let index = 0;
         let isConnected = false;
         count = 0;
-        connection_error = null;
         connection_timed_out = false;
         const retry = async () => {
-            isConnected = await init(host);
+            const { err, connected } = await init(host);
+            connection_error = err;  
+            isConnected = connected;
         }
         function myTimer() {   
-            console.log("index ", index, "isConnected ", isConnected, "host ", host)
-    
-            if(index === 30) {
-                count = 30;
+            console.log("count ", count, "isConnected ", isConnected, "host ", host)  
+            if(count === 30) {
                 connection_timed_out = true;
                 clearInterval(myInterval);
                 accept(index);
@@ -34,7 +33,7 @@ function connect(host = HOST) {
                 accept(index);
             }     
             retry(); 
-            index = index + 1;
+            count = count + 1;
         }
     });
 }
@@ -42,30 +41,28 @@ function connect(host = HOST) {
 
 async function init(host) {
     pool = mysql.createPool({
-        connectionLimit: 5,
+        connectionLimit: CONNECTION_LIMIT,
         host: host,
         user: USER,
         password: PASSWORD,
         database: DATABASE,
-        charset: 'utf8mb4',
+        charset: CHAR_SET,
     });
 
     return new Promise((accept, reject) => {
-        pool.query(
-            'CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), name varchar(255), completed boolean) DEFAULT CHARSET utf8mb4',
-            (err, results) => {
-                try {   
-                    if (err) {
-                        connection_error = err;
-                        accept(false);
-                    }
-                    accept(true)
-                } catch (e) {
-                    reject(false);
+        try {
+            const QUERY = `CREATE TABLE IF NOT EXISTS todo_items (id varchar(36), 
+                name varchar(255), completed boolean) DEFAULT CHARSET ${CHAR_SET}`;
+            const callback =  (err, results) => {
+                if (err) {
+                    accept({ err, connected: false });
                 }
-            },
-        );
-     
+                accept({ err, connected: true });
+            };  
+            pool.query(QUERY, callback);
+        } catch (e) {
+            reject(e);
+        }
     });
 }
 

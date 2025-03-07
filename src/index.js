@@ -1,36 +1,37 @@
 const express = require('express');
-const getItems = require('./routes/getItems');
-const addItem = require('./routes/addItem');
-const connect = require('./routes/connect');
-const getState = require('./routes/getState');
+const routes = require('./routes');
 
-// required to behave like a singleton. Import only once in app
+// database required to behave like a singleton. Import only once in app
 const db = require('./persistence'); 
-
-const injectServices = (fn) => {
-    return (req, res) => fn(req, res, db);
-}
-
-const app = express();
 
 (async function () {
     await db.connect();
 })();
 
+const injectServices = (fn) => {
+    return (req, res) => fn(req, res, db);
+}
+
+// Inject services into routes
+Object.keys(routes).forEach(key => {
+    routes[key] = injectServices(routes[key]); 
+});
+
+const { connect, addItem, getItems, getState } = routes;
+
+const app = express();
+ 
 app.use(express.json()); // Used to parse JSON bodies
 
 app.use(express.static(__dirname + '/static'));
 
-// Routes
+app.post('/connect', connect);
 
-app.post('/connect', injectServices(connect));
+app.post('/item', addItem);
 
-app.post('/item', injectServices(addItem));
+app.get('/items', getItems);
 
-app.get('/items', injectServices(getItems));
-
-app.get('/state', injectServices(getState)); 
-
+app.get('/state', getState); 
 
 app.listen(8080, () => console.log('Listening on port 8080'));
 
