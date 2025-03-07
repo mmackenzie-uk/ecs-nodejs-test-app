@@ -12,7 +12,7 @@ The application is based on the application from the getting started tutorial at
 https://github.com/docker/getting-started
 <br>
 <br>
-### Display
+### HTML
 <br>
 
 ![Alt text](https://github.com/mmackenzie-uk/ecs-nodejs-test-app/blob/main/display.png)
