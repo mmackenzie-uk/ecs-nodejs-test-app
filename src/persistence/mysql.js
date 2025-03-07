@@ -1,4 +1,4 @@
-// required to behave like a singleton. Import only once in app
+// database required to behave like a singleton. Import only once at root of the app
 
 const mysql = require('mysql2');
 const { HOST, USER, PASSWORD, DATABASE, CHAR_SET, CONNECTION_LIMIT } = require('../config');

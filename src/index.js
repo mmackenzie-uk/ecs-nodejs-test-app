@@ -1,7 +1,7 @@
 const express = require('express');
 const routes = require('./routes');
 
-// database required to behave like a singleton. Import only once in app
+// database required to behave like a singleton. Import only once at root of the app
 const db = require('./persistence'); 
 
 (async function () {
